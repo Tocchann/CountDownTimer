@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
+  <Product Id="3EB159E2-B785-4BED-A5CC-271F198DB1EA" Name="CountDownTimer" Language="1041" Codepage="932" Version="1.0.0.0" Manufacturer="Wankuma.Tocchann">
+    <Package Id="????????-????-????-????-????????????" Description="CountDownTimer" Comments="The 祭り 提出用？ｗ" InstallerVersion="200" Compressed="yes" />
+
+    <Media Id="1" Cabinet="Product.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="Wankuma" Name="Wankuma" >
+          <Directory Id="INSTALLLOCATION" Name="Tocchann">
+            <Component Id="CountDownTimer.exe" Guid="FC1119D0-C252-4FBB-B548-DD8172BC52F0">
+              <File Id="CountDownTimer.exe" Name="CntDwn.exe" LongName="CountDownTimer.exe" KeyPath="yes" DiskId="1" Source="Release\CountDownTimer.exe">
+                <Shortcut Id="CountDownTimer.exe" Name="CntDwn" LongName="カウントダウンタイマー" Description="カウントダウンタイマー" Advertise="yes" Directory="ProgramMenuFolder"/>
+              </File>
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder"/>
+    </Directory>
+
+    <Feature Id="CountDownTimer" Title="CountDownTimer" Level="1">
+      <ComponentRef Id="CountDownTimer.exe" />
+    </Feature>
+    <!-- ユーザーインターフェース -->
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+  </Product>
+</Wix>
