@@ -56,13 +56,14 @@ CCountDownTimerDlg::CCountDownTimerDlg(CWnd* pParent /*=NULL*/)
 void CCountDownTimerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange( pDX );
+	DDX_Control( pDX, IDC_SPIN1, m_spin1 );
 	DDX_Control( pDX, IDC_SPIN2, m_spin2 );
-	DDX_Control( pDX, IDC_DATETIMEPICKER1, m_timeoutTime );
 }
 
 BEGIN_MESSAGE_MAP(CCountDownTimerDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED( IDC_BUTTON1, &CCountDownTimerDlg::OnBnClickedButton1 )
 END_MESSAGE_MAP()
 
 
@@ -71,12 +72,12 @@ END_MESSAGE_MAP()
 BOOL CCountDownTimerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	ZeroMemory( &m_lf, sizeof( m_lf ) );
 
-	CTime nowTime = CTime::GetCurrentTime();
-	CTime timerTime( nowTime.GetYear(), nowTime.GetMonth(), nowTime.GetDay(), 0, 50, 0 );
-	m_timeoutTime.SetTime( &timerTime );
-	m_spin2.SetRange( 0, 100 );
-	m_spin2.SetPos( 0 );	//	1024なスクリーンだと1%で、10ピクセル程度
+	m_spin1.SetRange32( 1, 120 );	//	最長2時間まで
+	m_spin1.SetPos32( 50 );			//	デフォルトは50分
+	m_spin2.SetRange32( 0, 30 );
+	m_spin2.SetPos32( 5 );			//	スタートまでの余白時間は5秒
 
 	// IDM_ABOUTBOX は、システム コマンドの範囲内になければなりません。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -120,12 +121,21 @@ void CCountDownTimerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 void CCountDownTimerDlg::OnOK()
 {
 	if( UpdateData() ){
-		CTime time;
-		m_timeoutTime.GetTime( time );
-		UINT timeoutTime = time.GetHour() * 60 * 60 * 1000;
-		timeoutTime += time.GetMinute() * 60 * 1000;
-		timeoutTime += time.GetSecond() * 1000;
-		
-		CCountDownWnd::StartCountDown( timeoutTime, m_spin2.GetPos() );
+		CCountDownWnd::StartCountDown( m_spin1.GetPos32(), m_spin2.GetPos32(), &m_lf );
+	}
+}
+void CCountDownTimerDlg::OnBnClickedButton1()
+{
+	//	フォントの選択
+	LOGFONT* p = &m_lf;
+	if( m_lf.lfFaceName[0] == _T( '\0' ) )
+	{
+		p = nullptr;
+	}
+	CFontDialog	dlg( p, CF_SCREENFONTS|CF_NOVERTFONTS, nullptr, this );
+	if( dlg.DoModal() )
+	{
+		dlg.GetCurrentFont( &m_lf );
+		SetDlgItemText( IDC_STC_FONT, m_lf.lfFaceName );
 	}
 }

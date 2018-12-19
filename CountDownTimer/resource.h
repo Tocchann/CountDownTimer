@@ -11,8 +11,8 @@
 #define IDC_SPIN1                       1001
 #define IDC_EDIT2                       1002
 #define IDC_SPIN2                       1003
-#define IDC_SPIN3                       1004
-#define IDC_DATETIMEPICKER1             1005
+#define IDC_BUTTON1                     1004
+#define IDC_STC_FONT                    1005
 
 // Next default values for new objects
 // 
@@ -21,6 +21,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1006
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

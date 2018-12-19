@@ -8,19 +8,28 @@ class CCountDownWnd : public CWnd
 	DECLARE_DYNAMIC(CCountDownWnd)
 
 public:
-static	void StartCountDown( UINT nTimeoutTime, int size );	//	エラー発生は例外ｗ
+static	void StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf );	//	エラー発生は例外ｗ
 
 private:
 	CCountDownWnd();
 	virtual ~CCountDownWnd();
 
-	UINT_PTR	m_timerID;
-	UINT	m_resizeStep;
-	bool	m_bOver;
+	void	CalcTickCount( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime )
+	{
+		m_totalTime = nTimeoutTime*60 + nPrefixTime;	//	秒でセットされる
+		m_courseTime = 0;
+	}
 
-	CBrush	m_brDefBack;
-	CBrush	m_brTimeoutBack;
-	CToolTipCtrl	m_toolTip;
+
+	UINT_PTR	m_timerID;
+	UINT		m_totalTime;	//	実演時間(秒)
+	UINT		m_courseTime;	//	経過時間(秒)
+	ULONGLONG	m_startTime;	//	カウントダウン開始時刻
+	CSize		m_sizeWnd;		//	ウィンドウサイズ
+
+	CBrush		m_brDefBack;
+	CBrush		m_brTimeoutBack;
+	CFont		m_fntTimer;
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -36,6 +45,7 @@ protected:
 public:
 	afx_msg void OnRButtonUp( UINT nFlags, CPoint point );
 	afx_msg int OnCreate( LPCREATESTRUCT lpCreateStruct );
+	afx_msg void OnPaint();
 };
 
 
