@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(CCountDownTimerDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED( IDC_BUTTON1, &CCountDownTimerDlg::OnBnClickedButton1 )
+	ON_REGISTERED_MESSAGE( CCountDownWnd::s_closeCountdownWindow, &CCountDownTimerDlg::OnCloseCountdownWindow )
 END_MESSAGE_MAP()
 
 
@@ -76,8 +77,8 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 
 	m_spin1.SetRange32( 1, 120 );	//	最長2時間まで
 	m_spin1.SetPos32( 50 );			//	デフォルトは50分
-	m_spin2.SetRange32( 0, 30 );
-	m_spin2.SetPos32( 5 );			//	スタートまでの余白時間は5秒
+	m_spin2.SetRange32( 0, 59 );
+	m_spin2.SetPos32( 0 );			//	スタートまでの余白時間は0秒	セッションなのでスタート時間はピッタリからでも困らない。
 
 	// IDM_ABOUTBOX は、システム コマンドの範囲内になければなりません。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -148,4 +149,13 @@ void CCountDownTimerDlg::SetFontText( const LOGFONT& lf )
 	LPCTSTR unit = (lf.lfHeight < 0) ? _T( "pt" ) : _T( "dot" ) ;
 	msg.Format( _T( "%s(%d%s)" ), lf.lfFaceName, abs( lf.lfHeight ), unit );
 	SetDlgItemText( IDC_STC_FONT, msg );
+}
+LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam )
+{
+	if( wParam > 60 )
+	{
+		m_spin1.SetPos32( static_cast<int>(wParam/60) );
+		m_spin2.SetPos32( static_cast<int>(wParam%60) );
+	}
+	return 0;
 }

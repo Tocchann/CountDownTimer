@@ -35,4 +35,5 @@ public:
 	CSpinButtonCtrl m_spin1;
 	CSpinButtonCtrl m_spin2;
 	afx_msg void OnBnClickedButton1();
+	afx_msg LRESULT OnCloseCountdownWindow( WPARAM, LPARAM );
 };

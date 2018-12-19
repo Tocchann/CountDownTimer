@@ -7,8 +7,8 @@
 
 // CCountDownWnd
 
-IMPLEMENT_DYNAMIC(CCountDownWnd, CWnd)
-
+IMPLEMENT_DYNAMIC( CCountDownWnd, CWnd )
+UINT CCountDownWnd::s_closeCountdownWindow = ::RegisterWindowMessage( _T( "CCountDownWnd::ClosedWindow" ) );
 BEGIN_MESSAGE_MAP( CCountDownWnd, CWnd )
 	ON_WM_TIMER()
 	ON_WM_ERASEBKGND()
@@ -265,7 +265,16 @@ void CCountDownWnd::OnRButtonUp( UINT nFlags, CPoint point )
 	if( GetCapture() == this )
 	{
 		ReleaseCapture();
-		PostMessage( WM_CLOSE );
+		CRect	rc;
+		GetWindowRect( &rc );
+		if( rc.PtInRect( point ) )
+		{
+			if( m_courseTime < m_totalTime )
+			{
+				AfxGetMainWnd()->PostMessage( s_closeCountdownWindow, m_totalTime-m_courseTime );
+			}
+			PostMessage( WM_CLOSE );
+		}
 	}
 	else
 	{

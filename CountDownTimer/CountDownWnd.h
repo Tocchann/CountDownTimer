@@ -8,6 +8,7 @@ class CCountDownWnd : public CWnd
 	DECLARE_DYNAMIC(CCountDownWnd)
 
 public:
+	static UINT s_closeCountdownWindow;
 static	void StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf );	//	ÉGÉâÅ[î≠ê∂ÇÕó·äOÇó
 
 private:
