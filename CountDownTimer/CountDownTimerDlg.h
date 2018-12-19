@@ -21,7 +21,9 @@ public:
 
 // 実装
 protected:
-	HICON m_hIcon;
+	HICON	m_hIcon;
+	LOGFONT	m_lf;
+	CFont	m_fontTimer;
 
 	// 生成された、メッセージ割り当て関数
 	virtual BOOL OnInitDialog();
@@ -29,6 +31,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	virtual void OnOK();
 public:
+	CSpinButtonCtrl m_spin1;
 	CSpinButtonCtrl m_spin2;
-	CDateTimeCtrl m_timeoutTime;
+	afx_msg void OnBnClickedButton1();
 };

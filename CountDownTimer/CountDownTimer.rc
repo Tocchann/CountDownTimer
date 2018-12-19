@@ -87,19 +87,22 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_COUNTDOWNTIMER_DIALOG DIALOGEX 0, 0, 114, 58
+IDD_COUNTDOWNTIMER_DIALOG DIALOGEX 0, 0, 135, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "カウントダウンタイマー"
 FONT 9, "MS UI Gothic", 0, 0, 0x1
 BEGIN
-    RTEXT           "タイムアウト時間:",IDC_STATIC,4,4,50,14,SS_CENTERIMAGE
-    CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,60,4,50,15
-    LTEXT           "画面占有率(%)",IDC_STATIC,4,22,50,14,SS_CENTERIMAGE,WS_EX_RIGHT
-    EDITTEXT        IDC_EDIT2,60,22,50,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,50,30,10,14
-    DEFPUSHBUTTON   "スタート",IDOK,4,40,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,60,40,50,14
+    RTEXT           "タイムアウト(分):",IDC_STATIC,28,4,50,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT1,81,4,50,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,11,15,10,14
+    LTEXT           "余白時間(秒):",IDC_STATIC,28,22,50,14,SS_CENTERIMAGE,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT2,81,22,50,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,72,11,10,14
+    DEFPUSHBUTTON   "スタート",IDOK,28,57,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,81,57,50,14
+    LTEXT           "スタティック",IDC_STC_FONT,4,39,117,14,SS_CENTERIMAGE
+    PUSHBUTTON      "...",IDC_BUTTON1,121,39,10,14
 END
 
 
@@ -109,7 +112,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
+ FILEVERSION 3,0,1219,0
  PRODUCTVERSION 2,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -128,9 +131,9 @@ BEGIN
             VALUE "Comments", "The 祭り カウントダウンタイマー"
             VALUE "CompanyName", "とっちゃん"
             VALUE "FileDescription", "The 祭り カウントダウンタイマー"
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "3.0.1219.0"
             VALUE "InternalName", "CountDownTimer.exe"
-            VALUE "LegalCopyright", "Copyright 2008 とっちゃん All right reserved."
+            VALUE "LegalCopyright", "Copyright 2018 とっちゃん All right reserved."
             VALUE "OriginalFilename", "CountDownTimer.exe"
             VALUE "ProductName", "The 祭り"
             VALUE "ProductVersion", "2.0.0.0"
@@ -162,9 +165,9 @@ BEGIN
     IDD_COUNTDOWNTIMER_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 4
-        RIGHTMARGIN, 110
+        RIGHTMARGIN, 131
         TOPMARGIN, 4
-        BOTTOMMARGIN, 54
+        BOTTOMMARGIN, 71
     END
 END
 #endif    // APSTUDIO_INVOKED
