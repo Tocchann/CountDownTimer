@@ -30,6 +30,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 	virtual void OnOK();
+	void SetFontText( const LOGFONT& lf );
 public:
 	CSpinButtonCtrl m_spin1;
 	CSpinButtonCtrl m_spin2;

@@ -20,11 +20,12 @@ public:
 	CCountDownTimerApp();
 
 // オーバーライド
-	public:
+public:
 	virtual BOOL InitInstance();
-
+private:
+	void AddPrivateFonts();
 // 実装
-
+public:
 	DECLARE_MESSAGE_MAP()
 };
 

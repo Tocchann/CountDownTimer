@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "CountDownTimer.h"
 #include "CountDownTimerDlg.h"
+#include <atlpath.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -47,9 +48,35 @@ BOOL CCountDownTimerApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+	//	プライベートフォントをリストアップする
+	AddPrivateFonts();
+
 	CCountDownTimerDlg dlg;
 	m_pMainWnd = &dlg;
 	dlg.DoModal();
 
 	return FALSE;
+}
+void CCountDownTimerApp::AddPrivateFonts()
+{
+	TCHAR	modulePath[MAX_PATH];
+	GetModuleFileName( nullptr, modulePath, MAX_PATH );
+	*ATLPath::FindFileName( modulePath ) = _T( '\0' );	//	ファイル名で切ってフォルダにする
+	CPath	pathFonts;
+	pathFonts.Combine( modulePath, _T( "Fonts" ) );
+	WIN32_FIND_DATA	findData;
+	auto findFile = ::FindFirstFile( pathFonts.m_strPath + _T( "\\*.*" ), &findData );
+	if( findFile != INVALID_HANDLE_VALUE )
+	{
+		do
+		{
+			if( (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 )
+			{
+				CPath	filePath;
+				filePath.Combine( pathFonts, findData.cFileName );
+				AddFontResourceEx( filePath, FR_PRIVATE, nullptr );	//	エラーは無視
+			}
+		} while( FindNextFile( findFile, &findData ) );
+		FindClose( findFile );
+	}
 }

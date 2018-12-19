@@ -124,62 +124,75 @@ void CCountDownWnd::OnTimer(UINT_PTR nIDEvent)
 {
 	if( m_timerID == nIDEvent )
 	{
+		CRect	rc;
+		GetWindowRect( &rc );
 		if( m_startTime == 0 )
 		{
-			CRect	rc;
-			GetWindowRect( &rc );
 			m_sizeWnd = rc.Size();
 			m_startTime = GetTickCount64();
 			m_courseTime = 0;
 		}
 		auto resultTime = static_cast<UINT>( GetTickCount64()-m_startTime );
-		auto prev = m_courseTime;
+		bool countDown = m_courseTime != resultTime/1000 ;
 		m_courseTime = resultTime/1000;	//	ミリ秒単位なので秒に直す
-		//	経過時間内
-		CString	strCaption;
 		UINT	restTime;
 		int cxTime = m_totalTime*1000;
 		if( m_courseTime < m_totalTime )
 		{
 			restTime = m_totalTime-m_courseTime;
 			cxTime -= resultTime;
-			if( restTime > 60+30 )
-			{
-				strCaption.Format( _T( "残り:%d分%d秒" ), restTime/60, restTime%60 );
-			}
-			else
-			{
-				strCaption.Format( _T( "残り:%d秒" ), restTime );
-			}
 		}
-		//	時間超過！
 		else
 		{
 			restTime = m_courseTime-m_totalTime;
 			cxTime = resultTime-cxTime;
-			//	予定時間の二倍まで進んだら強制終了！
-			if( restTime > m_totalTime )
+		}
+		//	カウントダウンする場合(テキストが変わる)
+		if( countDown )
+		{
+			//	経過時間内
+			CString	strCaption;
+			if( m_courseTime < m_totalTime )
 			{
-				KillTimer( m_timerID );
-				m_timerID = 0;
-				PostMessage( WM_CLOSE );
-				return;
+				if( restTime > 60+30 )
+				{
+					strCaption.Format( _T( "残り:%d分%d秒" ), restTime/60, restTime%60 );
+				}
+				else
+				{
+					strCaption.Format( _T( "残り:%d秒" ), restTime );
+				}
 			}
-			if( restTime >= 60 )
-			{
-				strCaption.Format( _T( "%d 分 %d 秒時間超過" ), restTime/60, restTime%60 );
-			}
+			//	時間超過！
 			else
 			{
-				strCaption.Format( _T( "%d 秒時間超過" ), restTime );
+				//	予定時間の二倍まで進んだら強制終了！
+				if( restTime > m_totalTime )
+				{
+					KillTimer( m_timerID );
+					m_timerID = 0;
+					PostMessage( WM_CLOSE );
+					return;
+				}
+				if( restTime >= 60 )
+				{
+					strCaption.Format( _T( "%d 分 %d 秒時間超過" ), restTime/60, restTime%60 );
+				}
+				else
+				{
+					strCaption.Format( _T( "%d 秒時間超過" ), restTime );
+				}
 			}
+			SetWindowText( strCaption );
 		}
-		SetWindowText( strCaption );
 		//	ウィンドウはインジケータの役割を果たすので、そのままゲージを伸び縮みさせる
 		UINT	width = MulDiv( m_sizeWnd.cx, cxTime, m_totalTime*1000 );	//	ウィンドウサイズの刻みはもう少し細かくする
 		TRACE( _T( "%d:%4d-%02d:%02d\n" ), m_sizeWnd.cx, width, restTime/60, restTime%60 );
-		SetWindowPos( NULL, 0, 0, width, m_sizeWnd.cy, SWP_NOZORDER|SWP_NOMOVE|SWP_FRAMECHANGED );
-		if( m_courseTime != prev )
+		if( rc.Width() != width )
+		{
+			SetWindowPos( NULL, 0, 0, width, m_sizeWnd.cy, SWP_NOZORDER|SWP_NOMOVE|SWP_FRAMECHANGED );
+		}
+		else if( countDown )
 		{
 			Invalidate();
 		}
@@ -212,16 +225,15 @@ void CCountDownWnd::OnPaint()
 	dc.SetBkMode( TRANSPARENT );
 	CString	strText;
 	UINT	restTime = (m_courseTime < m_totalTime) ? m_totalTime-m_courseTime : m_courseTime-m_totalTime ;
-	if( restTime > 60 )
+	if( restTime >= 60 )
 	{
-		strText.Format( _T( "%02d:%02d" ), restTime/60, restTime%60 );
+		strText.Format( _T( "%d:%02d" ), restTime/60, restTime%60 );
 	}
 	else
 	{
 		strText.Format( _T( "%d" ), restTime%60 );
 	}
-	dc.DrawText( strText, rc, DT_CENTER|DT_VCENTER );
-	//dc.TextOut( 0, 0, strText, strText.GetLength() );
+	dc.TextOut( 0, 0, strText, strText.GetLength() );
 	if( pOld != nullptr )
 	{
 		dc.SelectObject( pOld );
