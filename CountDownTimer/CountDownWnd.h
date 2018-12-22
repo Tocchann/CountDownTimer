@@ -47,6 +47,7 @@ public:
 	afx_msg void OnRButtonUp( UINT nFlags, CPoint point );
 	afx_msg int OnCreate( LPCREATESTRUCT lpCreateStruct );
 	afx_msg void OnPaint();
+	afx_msg HFONT OnGetFont();
 };
 
 

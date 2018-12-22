@@ -17,6 +17,7 @@ BEGIN_MESSAGE_MAP( CCountDownWnd, CWnd )
 	ON_WM_RBUTTONUP()
 	ON_WM_CREATE()
 	ON_WM_PAINT()
+	ON_WM_GETFONT()
 END_MESSAGE_MAP()
 
 void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf )
@@ -89,11 +90,7 @@ BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 			}
 		}
 	}
-	auto pFont = &m_fntTimer;
-	if( pFont->m_hObject == nullptr )
-	{
-		pFont = CFont::FromHandle( static_cast<HFONT>(GetStockObject( DEFAULT_GUI_FONT )) );
-	}
+	auto pFont = GetFont();
 	//	タイマー時間が表示できる大きさがあればいい
 	{
 		CClientDC	dc( AfxGetMainWnd() );
@@ -209,15 +206,19 @@ void CCountDownWnd::PostNcDestroy()
 	delete this;	//	ウィンドウが破棄されたら自分を削除
 	theApp.m_pMainWnd->ShowWindow( SW_SHOW );
 }
-
+HFONT CCountDownWnd::OnGetFont()
+{
+	HFONT hFont = static_cast<HFONT>(m_fntTimer.m_hObject);
+	if( hFont == nullptr )
+	{
+		hFont = static_cast<HFONT>(GetStockObject( DEFAULT_GUI_FONT ));
+	}
+	return hFont;
+}
 void CCountDownWnd::OnPaint()
 {
 	CPaintDC dc( this );
-	auto pFont = &m_fntTimer;
-	if( pFont->m_hObject == nullptr )
-	{
-		pFont = CFont::FromHandle( static_cast<HFONT>(GetStockObject( DEFAULT_GUI_FONT )) );
-	}
+	auto pFont = GetFont();
 	auto pOld = (pFont != nullptr)? dc.SelectObject( pFont ) : nullptr ;
 	CRect	rc;
 	GetClientRect( rc );
