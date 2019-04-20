@@ -102,9 +102,8 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 小さいアイコンの設定
 
 	auto hFont = GetStockObject( DEFAULT_GUI_FONT );
-	LOGFONT lf;
-	GetObject( hFont, sizeof( lf ), &lf );
-	SetFontText( lf );
+	GetObject( hFont, sizeof( m_lf ), &m_lf );
+	SetFontText( m_lf );
 
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 }
@@ -137,7 +136,7 @@ void CCountDownTimerDlg::OnBnClickedButton1()
 		p = nullptr;
 	}
 	CFontDialog	dlg( p, CF_SCREENFONTS|CF_NOVERTFONTS, nullptr, this );
-	if( dlg.DoModal() )
+	if( dlg.DoModal() ==IDOK )
 	{
 		dlg.GetCurrentFont( &m_lf );
 		SetFontText( m_lf );

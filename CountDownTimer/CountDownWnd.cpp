@@ -90,7 +90,7 @@ BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 			}
 		}
 	}
-	auto pFont = GetFont();
+	auto pFont = &m_fntTimer;
 	//	タイマー時間が表示できる大きさがあればいい
 	{
 		CClientDC	dc( AfxGetMainWnd() );
