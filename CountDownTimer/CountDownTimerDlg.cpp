@@ -49,6 +49,9 @@ END_MESSAGE_MAP()
 
 CCountDownTimerDlg::CCountDownTimerDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CCountDownTimerDlg::IDD, pParent)
+	, m_lf{ 0 }
+	, m_start1(0)
+	, m_start2(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -65,6 +68,7 @@ BEGIN_MESSAGE_MAP(CCountDownTimerDlg, CDialog)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED( IDC_BUTTON1, &CCountDownTimerDlg::OnBnClickedButton1 )
 	ON_REGISTERED_MESSAGE( CCountDownWnd::s_closeCountdownWindow, &CCountDownTimerDlg::OnCloseCountdownWindow )
+	ON_BN_CLICKED( IDC_BTN_RESET, &CCountDownTimerDlg::OnBnClickedBtnReset )
 END_MESSAGE_MAP()
 
 
@@ -88,8 +92,7 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	if (pSysMenu != NULL)
 	{
 		CString strAboutMenu;
-		strAboutMenu.LoadString(IDS_ABOUTBOX);
-		if (!strAboutMenu.IsEmpty())
+		if( strAboutMenu.LoadString( IDS_ABOUTBOX ) && !strAboutMenu.IsEmpty() )
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
@@ -124,7 +127,9 @@ void CCountDownTimerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 void CCountDownTimerDlg::OnOK()
 {
 	if( UpdateData() ){
-		CCountDownWnd::StartCountDown( m_spin1.GetPos32(), m_spin2.GetPos32(), &m_lf );
+		m_start1 = m_spin1.GetPos32();
+		m_start2 = m_spin2.GetPos32();
+		CCountDownWnd::StartCountDown( m_start1, m_start2, &m_lf );
 	}
 }
 void CCountDownTimerDlg::OnBnClickedButton1()
@@ -145,8 +150,10 @@ void CCountDownTimerDlg::OnBnClickedButton1()
 void CCountDownTimerDlg::SetFontText( const LOGFONT& lf )
 {
 	CString msg;
-	LPCTSTR unit = (lf.lfHeight < 0) ? _T( "pt" ) : _T( "dot" ) ;
-	msg.Format( _T( "%s(%d%s)" ), lf.lfFaceName, abs( lf.lfHeight ), unit );
+	CClientDC dc( this );
+	int dpi = dc.GetDeviceCaps( LOGPIXELSY );
+	int height = abs( MulDiv( lf.lfHeight, 72, dpi ) );
+	msg.Format( _T( "%s(%dpt)" ), lf.lfFaceName, height );
 	SetDlgItemText( IDC_STC_FONT, msg );
 }
 LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam )
@@ -157,4 +164,12 @@ LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam
 		m_spin2.SetPos32( static_cast<int>(wParam%60) );
 	}
 	return 0;
+}
+void CCountDownTimerDlg::OnBnClickedBtnReset()
+{
+	if( m_start1 != 0 && m_start2 != 0 )
+	{
+		m_spin1.SetPos32( m_start1 );
+		m_spin2.SetPos32( m_start2 );
+	}
 }

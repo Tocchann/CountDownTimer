@@ -46,7 +46,10 @@ void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTim
 }
 
 CCountDownWnd::CCountDownWnd()
-:	m_timerID( 0 )
+: m_timerID( 0 )
+, m_totalTime( 0 )
+, m_courseTime( 0 )
+, m_startTime( 0 )
 {
 	m_brDefBack.CreateSolidBrush( RGB(255,0,0) );
 	m_brTimeoutBack.CreateSolidBrush( RGB(128,0,128) );

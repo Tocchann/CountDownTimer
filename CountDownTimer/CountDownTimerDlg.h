@@ -24,6 +24,8 @@ protected:
 	HICON	m_hIcon;
 	LOGFONT	m_lf;
 	CFont	m_fontTimer;
+	int		m_start1;
+	int		m_start2;
 
 	// 生成された、メッセージ割り当て関数
 	virtual BOOL OnInitDialog();
@@ -36,4 +38,5 @@ public:
 	CSpinButtonCtrl m_spin2;
 	afx_msg void OnBnClickedButton1();
 	afx_msg LRESULT OnCloseCountdownWindow( WPARAM, LPARAM );
+	afx_msg void OnBnClickedBtnReset();
 };
