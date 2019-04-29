@@ -167,7 +167,7 @@ LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam
 }
 void CCountDownTimerDlg::OnBnClickedBtnReset()
 {
-	if( m_start1 != 0 && m_start2 != 0 )
+	if( m_start1 != 0 || m_start2 != 0 )
 	{
 		m_spin1.SetPos32( m_start1 );
 		m_spin2.SetPos32( m_start2 );
