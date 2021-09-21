@@ -104,8 +104,21 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 大きいアイコンの設定
 	SetIcon(m_hIcon, FALSE);		// 小さいアイコンの設定
 
-	auto hFont = GetStockObject( DEFAULT_GUI_FONT );
-	GetObject( hFont, sizeof( m_lf ), &m_lf );
+	//	デフォルトは、キャプションフォントに合わせる
+	NONCLIENTMETRICS metric ={ 0 };
+	metric.cbSize = sizeof( metric );
+	if( SystemParametersInfo( SPI_GETNONCLIENTMETRICS, metric.cbSize, &metric, 0 ) )
+	{
+		m_lf = metric.lfCaptionFont;
+	}
+	else
+	{
+		auto hFont = GetStockObject( DEFAULT_GUI_FONT );
+		GetObject( hFont, sizeof( m_lf ), &m_lf );
+	}
+	//CClientDC dc( this );
+	//auto dpi = dc.GetDeviceCaps( LOGPIXELSY );
+	//m_lf.lfHeight = MulDiv( m_lf.lfHeight, dpi, 96 );	//	デフォルトDPIの値のはずなので換算しなおす
 	SetFontText( m_lf );
 
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
@@ -127,9 +140,14 @@ void CCountDownTimerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 void CCountDownTimerDlg::OnOK()
 {
 	if( UpdateData() ){
-		m_start1 = m_spin1.GetPos32();
-		m_start2 = m_spin2.GetPos32();
-		CCountDownWnd::StartCountDown( m_start1, m_start2, &m_lf );
+		auto start1 = m_spin1.GetPos32();
+		auto start2 = m_spin2.GetPos32();
+		if( m_start1 == 0 && m_start2 == 0 )
+		{
+			m_start1 = start1;
+			m_start2 = start2;
+		}
+		CCountDownWnd::StartCountDown( start1, start2, &m_lf );
 	}
 }
 void CCountDownTimerDlg::OnBnClickedButton1()
