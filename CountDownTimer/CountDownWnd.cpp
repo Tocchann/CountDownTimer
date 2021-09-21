@@ -20,7 +20,7 @@ BEGIN_MESSAGE_MAP( CCountDownWnd, CWnd )
 	ON_WM_GETFONT()
 END_MESSAGE_MAP()
 
-void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf )
+void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf, const CRect& rcWindow )
 {
 	if( plf != nullptr )
 	{
@@ -33,6 +33,7 @@ void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTim
 	strCaption.Format( _T( "残り...%d分" ), nTimeoutTime );
 
 	CCountDownWnd*	pWnd = new CCountDownWnd();
+	pWnd->m_rcWindow = rcWindow;
 	pWnd->CalcTickCount( nTimeoutTime, nPrefixTime );
 	if( pWnd->CreateEx( WS_EX_TOPMOST, nullptr, strCaption, WS_POPUP, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, plf ) ){
 		theApp.m_pMainWnd->ShowWindow( SW_HIDE );
@@ -58,7 +59,6 @@ CCountDownWnd::CCountDownWnd()
 CCountDownWnd::~CCountDownWnd()
 {
 }
-
 BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 {
 	//	サイズ変更で再描画・カーソルは手、背景はとりあえずデフォルトバックカラー
@@ -67,8 +67,8 @@ BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 		cs.lpszClass = AfxRegisterWndClass( CS_HREDRAW|CS_VREDRAW, LoadCursor( NULL, IDC_HAND ), m_brDefBack, NULL );
 	}
 	//	ワークエリアの最上部に張り付ける
-	CRect rc;
-	SystemParametersInfo( SPI_GETWORKAREA, sizeof( RECT ), &rc, 0 );
+	CRect rc = m_rcWindow;
+	//SystemParametersInfo( SPI_GETWORKAREA, sizeof( RECT ), &rc, 0 );
 	cs.x = rc.left;
 	cs.y = rc.top;
 	cs.cx = rc.Width();
@@ -76,8 +76,8 @@ BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 	//	フォントサイズを確定
 	if( m_fntTimer.m_hObject == nullptr && cs.lpCreateParams != nullptr )
 	{
-		auto plp = static_cast<LOGFONT*>(cs.lpCreateParams);
-		if( m_fntTimer.CreateFontIndirect( plp ) )
+		auto plf = static_cast<LOGFONT*>(cs.lpCreateParams);
+		if( m_fntTimer.CreateFontIndirect( plf ) )
 		{
 			LOGFONT lfCurr;
 			m_fntTimer.GetLogFont( &lfCurr );
@@ -88,7 +88,7 @@ BOOL CCountDownWnd::PreCreateWindow( CREATESTRUCT& cs )
 				m_fntTimer.DeleteObject();
 				if( m_fntTimer.CreateFontIndirect( &lfCurr ) )
 				{
-					plp->lfHeight = lfCurr.lfHeight;
+					plf->lfHeight = lfCurr.lfHeight;
 				}
 			}
 		}
@@ -269,16 +269,11 @@ void CCountDownWnd::OnRButtonUp( UINT nFlags, CPoint point )
 	if( GetCapture() == this )
 	{
 		ReleaseCapture();
-		CRect	rc;
-		GetWindowRect( &rc );
-		if( rc.PtInRect( point ) )
+		if( m_courseTime < m_totalTime )
 		{
-			if( m_courseTime < m_totalTime )
-			{
-				AfxGetMainWnd()->PostMessage( s_closeCountdownWindow, m_totalTime-m_courseTime );
-			}
-			PostMessage( WM_CLOSE );
+			AfxGetMainWnd()->PostMessage( s_closeCountdownWindow, m_totalTime-m_courseTime );
 		}
+		PostMessage( WM_CLOSE );
 	}
 	else
 	{

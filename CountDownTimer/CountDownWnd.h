@@ -9,7 +9,7 @@ class CCountDownWnd : public CWnd
 
 public:
 	static UINT s_closeCountdownWindow;
-static	void StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf );	//	エラー発生は例外ｗ
+static	void StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime, _In_ LOGFONT* plf, const CRect& rcWindow );	//	エラー発生は例外ｗ
 
 private:
 	CCountDownWnd();
@@ -21,7 +21,7 @@ private:
 		m_courseTime = 0;
 	}
 
-
+	CRect		m_rcWindow;		//	対象ウィンドウはユーザー指定
 	UINT_PTR	m_timerID;
 	UINT		m_totalTime;	//	実演時間(秒)
 	UINT		m_courseTime;	//	経過時間(秒)

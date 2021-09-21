@@ -61,6 +61,7 @@ void CCountDownTimerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange( pDX );
 	DDX_Control( pDX, IDC_SPIN1, m_spin1 );
 	DDX_Control( pDX, IDC_SPIN2, m_spin2 );
+	DDX_Control( pDX, IDC_COMBO_MONITOR, m_combMonitor );
 }
 
 BEGIN_MESSAGE_MAP(CCountDownTimerDlg, CDialog)
@@ -77,12 +78,6 @@ END_MESSAGE_MAP()
 BOOL CCountDownTimerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	ZeroMemory( &m_lf, sizeof( m_lf ) );
-
-	m_spin1.SetRange32( 1, 120 );	//	最長2時間まで
-	m_spin1.SetPos32( 50 );			//	デフォルトは50分
-	m_spin2.SetRange32( 0, 59 );
-	m_spin2.SetPos32( 0 );			//	スタートまでの余白時間は0秒	セッションなのでスタート時間はピッタリからでも困らない。
 
 	// IDM_ABOUTBOX は、システム コマンドの範囲内になければなりません。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -104,6 +99,12 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 大きいアイコンの設定
 	SetIcon(m_hIcon, FALSE);		// 小さいアイコンの設定
 
+	//	時間のエディットの初期値設定
+	m_spin1.SetRange32( 1, 120 );	//	最長2時間まで
+	m_spin1.SetPos32( 50 );			//	デフォルトは50分
+	m_spin2.SetRange32( 0, 59 );
+	m_spin2.SetPos32( 0 );			//	スタートまでの余白時間は0秒	セッションなのでスタート時間はピッタリからでも困らない。
+
 	//	デフォルトは、キャプションフォントに合わせる
 	NONCLIENTMETRICS metric ={ 0 };
 	metric.cbSize = sizeof( metric );
@@ -121,6 +122,29 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	//m_lf.lfHeight = MulDiv( m_lf.lfHeight, dpi, 96 );	//	デフォルトDPIの値のはずなので換算しなおす
 	SetFontText( m_lf );
 
+	//	モニターをリストアップして、コンボに設定(ラムダはなにもキャプチャしなければ関数コールに置き換えてくれる)
+	EnumDisplayMonitors( nullptr, nullptr, []( HMONITOR hMon, HDC, LPRECT, LPARAM lParam )
+	{
+		std::list<MONITORINFOEX>& monitorInfos = *reinterpret_cast<std::list<MONITORINFOEX>*>(lParam);
+		MONITORINFOEX info={};
+		info.cbSize = sizeof( info );
+		if( GetMonitorInfo( hMon, &info ) )
+		{
+			monitorInfos.push_back( info );
+		}
+		return TRUE;
+	}, reinterpret_cast<LPARAM>(&m_monitorInfos) );
+	
+	int curSel = -1;
+	for( const auto& info : m_monitorInfos )
+	{
+		int index = m_combMonitor.AddString( info.szDevice );
+		if( info.dwFlags == MONITORINFOF_PRIMARY )
+		{
+			curSel = index;
+		}
+	}
+	m_combMonitor.SetCurSel( curSel );
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 }
 
@@ -136,6 +160,8 @@ void CCountDownTimerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CDialog::OnSysCommand(nID, lParam);
 	}
 }
+#include <ShellScalingApi.h>
+#pragma comment(lib,"Shcore.lib")
 
 void CCountDownTimerDlg::OnOK()
 {
@@ -147,7 +173,27 @@ void CCountDownTimerDlg::OnOK()
 			m_start1 = start1;
 			m_start2 = start2;
 		}
-		CCountDownWnd::StartCountDown( start1, start2, &m_lf );
+		int curSel = m_combMonitor.GetCurSel();
+		CString selDeviceName;
+		m_combMonitor.GetLBText( curSel, selDeviceName );
+		CRect rcWindow;
+		for( const auto& info : m_monitorInfos )
+		{
+			if( selDeviceName == info.szDevice )
+			{
+				rcWindow = info.rcWork;
+				break;
+			}
+		}
+		auto hMon = MonitorFromRect( &rcWindow, MONITOR_DEFAULTTONEAREST );
+		UINT xDPI, yDPI;
+		GetDpiForMonitor( hMon, MDT_DEFAULT, &xDPI, &yDPI );
+
+		//	ダイアログがある側のモニターサイズで算出されているはずなので、計算しなおしてやる必要がある
+		CClientDC dc( this );
+		LOGFONT lf = m_lf;
+		lf.lfHeight = MulDiv( lf.lfHeight, yDPI, dc.GetDeviceCaps( LOGPIXELSY ) );
+		CCountDownWnd::StartCountDown( start1, start2, &lf, rcWindow );
 	}
 }
 void CCountDownTimerDlg::OnBnClickedButton1()
@@ -185,9 +231,18 @@ LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam
 }
 void CCountDownTimerDlg::OnBnClickedBtnReset()
 {
+	//	前回タイマースタートの時間があった場合はそれに戻す
 	if( m_start1 != 0 || m_start2 != 0 )
 	{
 		m_spin1.SetPos32( m_start1 );
 		m_spin2.SetPos32( m_start2 );
+		//	一度リセットしたら、覚えた値は忘れる
+		m_start1 = m_start2 = 0;
+	}
+	//	設定がない場合は初期値を再設定
+	else
+	{
+		m_spin1.SetPos32( 50 );
+		m_spin2.SetPos32( 0 );
 	}
 }

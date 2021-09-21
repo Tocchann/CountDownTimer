@@ -2,7 +2,6 @@
 //
 
 #pragma once
-#include "afxcmn.h"
 
 
 // CCountDownTimerDlg ダイアログ
@@ -27,6 +26,8 @@ protected:
 	int		m_start1;
 	int		m_start2;
 
+	std::list<MONITORINFOEX> m_monitorInfos;
+
 	// 生成された、メッセージ割り当て関数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -39,4 +40,5 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg LRESULT OnCloseCountdownWindow( WPARAM, LPARAM );
 	afx_msg void OnBnClickedBtnReset();
+	CComboBox m_combMonitor;
 };
