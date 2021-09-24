@@ -15,12 +15,6 @@ private:
 	CCountDownWnd();
 	virtual ~CCountDownWnd();
 
-	void	CalcTickCount( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTime )
-	{
-		m_totalTime = nTimeoutTime*60 + nPrefixTime;	//	秒でセットされる
-		m_courseTime = 0;
-	}
-
 	CRect		m_rcWindow;		//	対象ウィンドウはユーザー指定
 	UINT_PTR	m_timerID;
 	UINT		m_totalTime;	//	実演時間(秒)

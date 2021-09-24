@@ -41,4 +41,5 @@ public:
 	afx_msg LRESULT OnCloseCountdownWindow( WPARAM, LPARAM );
 	afx_msg void OnBnClickedBtnReset();
 	CComboBox m_combMonitor;
+	afx_msg void OnEnUpdateEdit();
 };

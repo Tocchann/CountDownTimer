@@ -70,6 +70,8 @@ BEGIN_MESSAGE_MAP(CCountDownTimerDlg, CDialog)
 	ON_BN_CLICKED( IDC_BUTTON1, &CCountDownTimerDlg::OnBnClickedButton1 )
 	ON_REGISTERED_MESSAGE( CCountDownWnd::s_closeCountdownWindow, &CCountDownTimerDlg::OnCloseCountdownWindow )
 	ON_BN_CLICKED( IDC_BTN_RESET, &CCountDownTimerDlg::OnBnClickedBtnReset )
+	ON_EN_UPDATE( IDC_EDIT1, &CCountDownTimerDlg::OnEnUpdateEdit )
+	ON_EN_UPDATE( IDC_EDIT2, &CCountDownTimerDlg::OnEnUpdateEdit )
 END_MESSAGE_MAP()
 
 
@@ -245,4 +247,10 @@ void CCountDownTimerDlg::OnBnClickedBtnReset()
 		m_spin1.SetPos32( 50 );
 		m_spin2.SetPos32( 0 );
 	}
+}
+
+
+void CCountDownTimerDlg::OnEnUpdateEdit()
+{
+	m_start1 = m_start2 = 0;
 }

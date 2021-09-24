@@ -34,7 +34,10 @@ void CCountDownWnd::StartCountDown( _In_ UINT nTimeoutTime, _In_ UINT nPrefixTim
 
 	CCountDownWnd*	pWnd = new CCountDownWnd();
 	pWnd->m_rcWindow = rcWindow;
-	pWnd->CalcTickCount( nTimeoutTime, nPrefixTime );
+	//	総表示時間を設定
+	pWnd->m_totalTime = nTimeoutTime*60 + nPrefixTime;
+	//	経過時間をリセット
+	pWnd->m_courseTime = 0;
 	if( pWnd->CreateEx( WS_EX_TOPMOST, nullptr, strCaption, WS_POPUP, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, plf ) ){
 		theApp.m_pMainWnd->ShowWindow( SW_HIDE );
 		pWnd->ShowWindow( SW_SHOWNOACTIVATE );
@@ -117,6 +120,10 @@ int CCountDownWnd::OnCreate( LPCREATESTRUCT lpCreateStruct )
 	{
 		AfxMessageBox( _T( "がーん...orz\n\nタイマーが動きません。" ) );
 		return -1;
+	}
+	else
+	{
+		m_timerID = AFX_IDM_WINDOW_FIRST;
 	}
 	return 0;
 }
