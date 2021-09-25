@@ -25,6 +25,7 @@ protected:
 	CFont	m_fontTimer;
 	int		m_start1;
 	int		m_start2;
+	bool	m_blockReset;
 
 	std::list<MONITORINFOEX> m_monitorInfos;
 

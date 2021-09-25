@@ -52,6 +52,7 @@ CCountDownTimerDlg::CCountDownTimerDlg(CWnd* pParent /*=NULL*/)
 	, m_lf{ 0 }
 	, m_start1(0)
 	, m_start2(0)
+	, m_blockReset( false )
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -102,10 +103,12 @@ BOOL CCountDownTimerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 小さいアイコンの設定
 
 	//	時間のエディットの初期値設定
+	m_blockReset = true;
 	m_spin1.SetRange32( 1, 120 );	//	最長2時間まで
 	m_spin1.SetPos32( 50 );			//	デフォルトは50分
 	m_spin2.SetRange32( 0, 59 );
 	m_spin2.SetPos32( 0 );			//	スタートまでの余白時間は0秒	セッションなのでスタート時間はピッタリからでも困らない。
+	m_blockReset = false;
 
 	//	デフォルトは、キャプションフォントに合わせる
 	NONCLIENTMETRICS metric ={ 0 };
@@ -226,13 +229,16 @@ LRESULT CCountDownTimerDlg::OnCloseCountdownWindow( WPARAM wParam, LPARAM lParam
 {
 	if( wParam > 60 )
 	{
+		m_blockReset = true;
 		m_spin1.SetPos32( static_cast<int>(wParam/60) );
 		m_spin2.SetPos32( static_cast<int>(wParam%60) );
+		m_blockReset = false;
 	}
 	return 0;
 }
 void CCountDownTimerDlg::OnBnClickedBtnReset()
 {
+	m_blockReset = true;
 	//	前回タイマースタートの時間があった場合はそれに戻す
 	if( m_start1 != 0 || m_start2 != 0 )
 	{
@@ -247,10 +253,14 @@ void CCountDownTimerDlg::OnBnClickedBtnReset()
 		m_spin1.SetPos32( 50 );
 		m_spin2.SetPos32( 0 );
 	}
+	m_blockReset = false;
 }
 
 
 void CCountDownTimerDlg::OnEnUpdateEdit()
 {
-	m_start1 = m_start2 = 0;
+	if( !m_blockReset )
+	{
+		m_start1 = m_start2 = 0;
+	}
 }
